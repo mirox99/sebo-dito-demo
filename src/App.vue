@@ -1,34 +1,54 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+    <div id="app">
+        <transition name="route">
+            <router-view key="route "/>
+        </transition>
+        <customCursor/>
+    </div>
 </template>
 
+<script>
+    import customCursor from '@/components/cursor'
+
+    export default {
+        components: {customCursor}
+    }
+</script>
+
 <style>
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+    }
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-#nav {
-  padding: 30px;
-}
+    #app {
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+    }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+    #nav {
+        padding: 30px;
+    }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+    #nav a {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    #nav a.router-link-exact-active {
+        color: #42b983;
+    }
+
+
 </style>
