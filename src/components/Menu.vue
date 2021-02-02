@@ -1,7 +1,13 @@
 <template>
     <div :class="{active: menuIsOpen,black:whiteBlank}" class="menu">
         <div @click="toggleMenu" class="icon-container">
-            <img v-show="whiteBlank" src="../assets/search.svg" class="search" alt="search-icon">
+            <svg v-show="whiteBlank" class="search" viewBox="0 0 24.348 25.037">
+                <g id="search" transform="translate(-18.321 -17.409)">
+                    <path id="Path_21" data-name="Path 21"
+                          d="M28.726,38.218a10.4,10.4,0,0,0,6.17-2.03L41,42.446l1.674-1.631L36.609,34.6a10.4,10.4,0,1,0-7.884,3.62Zm0-18.472a8.067,8.067,0,1,1-8.067,8.067A8.077,8.077,0,0,1,28.726,19.746Z"
+                          fill="#fff"/>
+                </g>
+            </svg>
             <div class="burger-icon">
                 <div class="hamburger">
                     <span></span>
@@ -15,7 +21,7 @@
             </div>
         </div>
         <transition name="slide">
-            <div v-if="menuIsOpen" :style="{background:hoverColor}" data_cursor="menu" class="content">
+            <div v-show="menuIsOpen" :style="{background:hoverColor}" data_cursor="menu" class="content">
                 <ul class="menu-list" data_cursor="menu">
                     <li @mouseover="listItemMouseHover(item)" v-for="item in menuList"
                         :key="item.id"
@@ -28,11 +34,13 @@
                 </ul>
             </div>
         </transition>
+        <customCursor/>
     </div>
 </template>
 
 <script>
     import {mapGetters, mapActions} from 'vuex'
+    import customCursor from '@/components/cursor'
 
     export default {
         name: 'Menu',
@@ -47,6 +55,7 @@
                 hoverColor: 'rgba(106, 0, 71, 0.61)',
             }
         },
+        components: {customCursor},
         computed: {
             ...mapGetters('menu', {
                 menuIsOpen: 'menuIsOpen',
@@ -88,6 +97,7 @@
         z-index: 10;
         background-color: transparent;
         pointer-events: none;
+        cursor: none;
 
         &.active {
             pointer-events: auto;
@@ -105,7 +115,7 @@
                         span {
                             &:nth-child(1) {
                                 height: 100%;
-                                transition-delay: .325s;
+                                transition: all .3s .325s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
 
                             }
                         }
@@ -113,7 +123,7 @@
                         span {
                             &:nth-child(2) {
                                 width: 100%;
-                                transition-delay: .125s;
+                                transition: all .3s .125s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                             }
                         }
                     }
@@ -123,11 +133,50 @@
 
         &.black {
             .icon-container {
+                padding: 15px 10px 15px 15px;
+                height: unset;
+                width: 80px;
+                justify-content: space-between;
                 animation: slideLeft .7s .7s $ease-out;
                 background: black;
 
                 .search {
                     animation: bounce .3s 1.2s $ease-out;
+                }
+
+                &:hover {
+                    span {
+                        background: white;
+                    }
+                }
+            }
+        }
+
+        &.black.active {
+            .icon-container {
+                background: white;
+                transition: background-color .3s .7s $ease-in-out;
+
+                .cross {
+                    span {
+                        background-color: black;
+
+                        &:nth-child(1) {
+                            transition: all .4s .7s cubic-bezier(0, .01, .55, .99), background .7s $ease-in-out;
+                        }
+
+                        &:nth-child(2) {
+                            transition: all .4s .925s cubic-bezier(0, .01, .55, .99), background .7s $ease-in-out;
+                        }
+                    }
+
+                }
+
+                .search {
+                    path {
+                        fill: black;
+                        transition: all .4s .7 $ease-in-out !important;
+                    }
                 }
             }
         }
@@ -137,18 +186,26 @@
             top: 50%;
             left: 0;
             pointer-events: auto;
-            width: 80px;
-            z-index: 3;
+            z-index: 10;
             transform: translateY(-50%);
             display: flex;
-            justify-content: space-between;
-            padding: 15px 10px 15px 15px;
+            width: 65px;
+            height: 65px;
+            padding: 15px;
+            align-items: center;
+            justify-content: center;
 
             span {
                 display: block;
                 background: white;
                 transition: all .3s cubic-bezier(0, .01, .55, .99);
 
+            }
+
+            &:hover {
+                span {
+                    background: black;
+                }
             }
 
             .search {
@@ -174,15 +231,15 @@
                         position: relative;
 
                         &:nth-child(1) {
-                            transition-delay: .6s;
+                            transition: width .3s .6s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                         }
 
                         &:nth-child(2) {
-                            transition-delay: .5s;
+                            transition: width .3s .5s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                         }
 
                         &:nth-child(3) {
-                            transition-delay: .7s;
+                            transition: width .3s .7s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                         }
                     }
                 }
@@ -199,7 +256,7 @@
                             width: 2px;
                             position: absolute;
                             left: 10.5px;
-                            transition-delay: 0s;
+                            transition: all .3s 0s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                         }
 
                         &:nth-child(2) {
@@ -207,7 +264,7 @@
                             height: 2px;
                             position: absolute;
                             top: 10.5px;
-                            transition-delay: .25s;
+                            transition: all .3s .25s cubic-bezier(0, .01, .55, .99), background .3s $ease-in-out;
                         }
                     }
                 }
@@ -223,7 +280,7 @@
 
             &.slide-enter-active {
                 transform: translateY(0);
-                transition: transform .7s $ease-out;
+                transition: transform .8s $ease-out;
 
                 .menu-list {
                     .title {

@@ -6,7 +6,7 @@
                     <div v-for="item in row.projects"
                          :key="row.id+item.id"
                          :ref="row.id+item.id+'prev'"
-                         @click="itemClick(row.id+item.id+'prev')"
+                         @click="itemClick(row.id+item.id+'prev',item)"
                          class="project-item">
                         <img :src="getImagePath(item.src)"
                              class="project-item-image"
@@ -20,7 +20,7 @@
                     <div v-for="item in row.projects"
                          :key="row.id+item.id+'item'"
                          :ref="row.id+item.id+'main'"
-                         @click="itemClick(row.id+item.id+'main')"
+                         @click="itemClick(row.id+item.id+'main',item)"
                          class="project-item">
                         <img :src="getImagePath(item.src,row.id+item.id+'item')"
                              class="project-item-image"
@@ -34,7 +34,7 @@
                     <div v-for="item in row.projects"
                          :key="row.id+item.id"
                          :ref="row.id+item.id+'after'"
-                         @click="itemClick(row.id+item.id+'after')"
+                         @click="itemClick(row.id+item.id+'after',item)"
                          class="project-item">
                         <img :src="getImagePath(item.src)" class="project-item-image" :alt="item.name">
                         <div class="item-content">
@@ -68,6 +68,8 @@
                 animationInitTimeout: null,
                 clickedItemPosition: null,
                 childRouteInterval: null,
+                fullImages: [6, 7, 8, 9, 15],
+                clickedImage: null
             }
         },
         components: {Menu},
@@ -98,7 +100,7 @@
             },
             clickedElementStyles() {
                 return {
-                    backgroundImage: `url(${require('../../assets/fullproject6.svg')})`,
+                    backgroundImage: `url(${require(`../../assets/fullproject${this.clickedImage}.svg`)})`,
                     top: `${this.clickedItemPosition.top}px`,
                     left: `${this.clickedItemPosition.left}px`,
                     width: `${this.clickedItemPosition.width}px`,
@@ -110,21 +112,22 @@
             getImagePath(path) {
                 return require(`@/${path}`)
             },
-            itemClick(ref) {
+            itemClick(ref, item) {
                 this.clearWindow();
-                let item = this.$refs[ref][0].getBoundingClientRect();
+                this.clickedImage = this.fullImages.find(id => id === item.id) ? item.id : 15;
+                let itemPosition = this.$refs[ref][0].getBoundingClientRect();
                 this.$refs[ref][0].classList.add('clicked');
-                const left = item.left;
-                const top = item.top;
-                const width = item.width;
-                const height = item.height;
+                const left = itemPosition.left;
+                const top = itemPosition.top;
+                const width = itemPosition.width;
+                const height = itemPosition.height;
                 this.clickedItemPosition = {top, left, width, height};
 
                 this.childRouteInterval = setTimeout(() => {
                     this.$router.push({
                         name: 'project_id',
                         params: {
-                            id: '2',
+                            id: item.id,
                             routeFromParent: true
                         }
                     }).then(e => console.log(e))
@@ -174,6 +177,7 @@
                 }, 1)
             },
             onMouseWheel(event) {
+                if (this.menuIsOpen) return
                 clearInterval(this.rowInterval);
                 clearTimeout(this.mousewheelTimeOut);
 
@@ -203,7 +207,7 @@
                 this.animationInitTimeout = setTimeout(() => {
                     window.addEventListener(`wheel`, this.onMouseWheel);
                     this.initRowAnimation()
-                }, 1380);
+                }, 1550);
                 this.setAfterClonesPosition()
             })
         },
@@ -225,13 +229,13 @@
         grid-auto-flow: column;
         grid-gap: 20px;
         background-color: white;
-        transition: background-color .7s .1s $ease-in;
+        transition: background-color .7s .7s $ease-in-out;
         overflow: hidden;
         top: 0;
         min-height: 100vh;
 
         &.active_menu {
-            transition: background-color 1s $ease-out;
+            transition: background-color .7s .7s $ease-in-out;
             background-color: black;
         }
 
@@ -292,8 +296,8 @@
                     }
 
                     &.clicked {
-                        opacity: 1 !important;
-                        animation: bounce .5s $ease-in-out;
+                        opacity: 1;
+                        animation: bounce .5s $ease-in-out, fade .1ms .7s ease forwards !important;
 
                         &::after {
                             opacity: 0;
@@ -343,7 +347,7 @@
             background-size: cover;
 
             &.animated {
-                animation: fade 1s .6s $ease-in-out forwards !important;
+                animation: scaleImage 1s .6s $ease-in-out forwards !important;
             }
 
             &.fade-enter-active {
@@ -357,7 +361,7 @@
         }
 
         &.route-enter-active {
-            transition: all 1.4s, transform .7s $ease-out;
+            transition: all 1.55s, transform .7s $ease-out;
             transform: translateY(0);
             z-index: 100 !important;
 
@@ -388,7 +392,7 @@
                 .image-container {
                     &.prev {
                         opacity: 1;
-                        transition: opacity .1ms 1.4s $ease-out !important;
+                        transition: opacity .1ms 1.55s $ease-out !important;
                     }
                 }
 
@@ -473,7 +477,7 @@
 
         }
 
-        @keyframes fade {
+        @keyframes scaleImage {
             100% {
                 height: 100vh;
                 width: 90%;
@@ -487,6 +491,14 @@
             }
             100% {
                 transform: scale(1);
+            }
+        }
+        @keyframes fade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
             }
         }
         @keyframes bounce_fade {

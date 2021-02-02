@@ -1,51 +1,50 @@
 <template>
-    <div ref="cursor" v-if="showCursor" :class="{'menu-cursor':targetIsMenu}" class="cursor">
-        <img src="../assets/plus.png" class="plus-icon" alt="plus icon">
+    <div ref="cursor" :class="{'show':showCursor,'menu-is-open':menuIsOpen}" class="cursor-container">
+        <div class="circle-cursor circle-cursor--inner"></div>
+        <div class="circle-cursor circle-cursor--outer">
+            <img v-show="menuIsOpen" src="../assets/plus.png" class="plus-icon" alt="plus icon">
+        </div>
     </div>
 </template>
 
 <script>
-    import Worker from "worker-loader!../Worker.js";
-
-    let worker = new Worker();
+    import Cursor from '@/Cursor'
+    import {mapGetters} from 'vuex'
 
     export default {
         name: 'customCursor',
 
         data() {
             return {
-                cursorPosition: {x: 0, y: 0},
-                targetIsMenu: false,
+                cursorTimeOut: null,
             }
         },
         computed: {
+            ...mapGetters('menu', {
+                menuIsOpen: 'menuIsOpen',
+            }),
             showCursor() {
-                return this.$route.name === 'Home'
-            }
+                return this.$route.name !== 'Home'
+            },
         },
         methods: {
-            CursorWorkerInit() {
-                worker.onmessage = (event) => {
-                    let {clientX, clientY} = event.data;
-                    let cursorStyle = this.$refs.cursor || {};
-
-                    document.documentElement.style.setProperty('--cursorX', clientX - (cursorStyle.clientHeight / 2) + 'px');
-                    document.documentElement.style.setProperty('--cursorY', clientY - (cursorStyle.clientWidth / 2) + 'px')
-                };
-            },
-            mouseMoveHandler() {
-                self.addEventListener('mousemove', ({clientX, clientY, target}) => {
-                    let targetAttr = target.attributes.data_cursor || {}
-
-                    this.targetIsMenu = targetAttr.value === 'menu'
-
-                    worker.postMessage({clientX, clientY})
-                });
-            },
+            initCursor() {
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        new Cursor(this)
+                    }, 100)
+                })
+            }
         },
         mounted() {
-            this.mouseMoveHandler();
-            this.CursorWorkerInit()
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    this.initCursor()
+                })
+            }, 1500)
+        },
+        beforeDestroy() {
+            clearTimeout(this.cursorTimeOut)
         }
     }
 </script>
@@ -55,28 +54,52 @@
     $ease-out: cubic-bezier(0, 0, .01, .99);
     $ease-in: cubic-bezier(.85, .01, .85, 1);
 
-    .cursor {
+    .cursor-container {
         position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        top: 0;
-        left: 0;
-        z-index: 10;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: white;
-        transition: all .3s $ease-in-out, transform .5s $ease-out;
-        transform: translate(var(--cursorX), var(--cursorY));
-        pointer-events: none;
-        border: 1px solid white;
-        opacity: 0;
-        animation: fade .2s .9s $ease-in forwards;
+
+        &.show {
+            .circle-cursor {
+                background: transparent;
+            }
+        }
+
+        &.menu-is-open {
+            .circle-cursor {
+                border: 1px solid white;
+            }
+        }
+
+        .circle-cursor {
+            position: fixed;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            border-radius: 50%;
+            transition: all .3s $ease-in-out, transform .7s $ease-out;
+            background: white;
+        }
+
+        .circle-cursor--outer {
+            width: 30px;
+            height: 30px;
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-cursor--inner {
+            width: 5px;
+            height: 5px;
+            left: -2.5px;
+            top: -2.5px;
+            z-index: 8;
+            opacity: 0;
+            background: transparent;
+        }
 
         .plus-icon {
             width: 20px;
-            opacity: 0;
         }
 
         &.menu-cursor {
@@ -89,6 +112,8 @@
             }
         }
     }
+
+
 
     @keyframes fade {
         0% {

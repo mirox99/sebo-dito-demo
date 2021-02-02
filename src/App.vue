@@ -3,15 +3,12 @@
         <transition name="route">
             <router-view key="route "/>
         </transition>
-        <customCursor/>
     </div>
 </template>
 
 <script>
-    import customCursor from '@/components/cursor'
 
     export default {
-        components: {customCursor}
     }
 </script>
 
@@ -21,6 +18,8 @@
         padding: 0;
         overflow: hidden;
         background-color: black;
+        height: 100vh;
+        width: 100vw;
     }
 
     * {
@@ -35,6 +34,13 @@
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
         color: #2c3e50;
+
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
     }
 
     #nav {

@@ -28,7 +28,6 @@
     import debounce from 'lodash/debounce'
     import {mapGetters} from 'vuex'
     import Menu from '@/components/Menu'
-    // import {gsap} from 'gsap/all'
 
     export default {
         name: 'Home',
@@ -50,6 +49,8 @@
                 prevCursorPositionX: 0,
                 cursorPosition: {x: 0, y: 0},
                 slideMoveInterval: null,
+                eventTimeouts: [],
+                debounceMouseMove: null
             }
         },
         components: {Menu},
@@ -69,7 +70,7 @@
                 let top = -90;
                 let inActiveSlideDom = this.$refs[`slide${this.inActiveSlide.id}`][0];
 
-                setTimeout(() => {
+                this.eventTimeouts[2] = setTimeout(() => {
                     clearInterval(this.slideMoveInterval);
                     inActiveSlideDom.style.transform = `translateY(0px)`;
 
@@ -85,21 +86,6 @@
                 let slideY = this.cursorPosition.y / window.innerHeight * 100;
                 const slideDom = this.$refs[`slide${slide.id}`][0];
 
-                // gsap.to(".swiper-image.active", 1, {clipPath: `circle(141% at ${slideX}% ${slideY}%)`})
-
-                // gsap.timeline({
-                //     defaults: {
-                //         duration: 1
-                //     }
-                // })
-                //     .to('#slide' + slide.id, {
-                //         clipPath: `circle(0% at ${slideX}% ${slideY}%)`,
-                //     })
-                //     .to('#slide' + slide.id, {
-                //         clipPath: `circle(144% at ${slideX}% ${slideY}%)`,
-                //     });
-
-
                 slideDom.animate(
                     [
                         {clipPath: `circle(0% at ${slideX}% ${slideY}%)`},
@@ -111,37 +97,43 @@
 
                 this.slideMoveUp(slideDom, 580)
             },
-            mouseMoveHandler() {
+            mouseMoveHandler(e) {
                 const [firstSlide, secondSlide] = this.slides;
-                document.addEventListener('mousemove', debounce((e) => {
-                    if (this.menuIsOpen) return;
-                    const halfWindowWidth = window.innerWidth / 2;
 
-                    this.cursorPosition = {x: e.x, y: e.y};
+                if (this.menuIsOpen) return;
+                const halfWindowWidth = window.innerWidth / 2;
 
-                    if (e.x > halfWindowWidth && this.prevCursorPositionX < halfWindowWidth) {
-                        setTimeout(() => {
-                            this.slideAnimationHandler(secondSlide)
-                        }, 100)
-                    }
-                    if (e.x < halfWindowWidth && this.prevCursorPositionX > halfWindowWidth) {
-                        setTimeout(() => {
-                            this.slideAnimationHandler(firstSlide)
-                        }, 100)
-                    }
-                    this.prevCursorPositionX = e.x
-                }, 400), false);
+                this.cursorPosition = {x: e.x, y: e.y};
+
+                if (e.x > halfWindowWidth && this.prevCursorPositionX < halfWindowWidth) {
+                    this.eventTimeouts[0] = setTimeout(() => {
+                        this.slideAnimationHandler(secondSlide)
+                    }, 100)
+                }
+                if (e.x < halfWindowWidth && this.prevCursorPositionX > halfWindowWidth) {
+                    this.eventTimeouts[1] = setTimeout(() => {
+                        this.slideAnimationHandler(firstSlide)
+                    }, 100)
+                }
+                this.prevCursorPositionX = e.x
             },
+            windowEventHandler() {
+                this.debounceMouseMove = debounce(this.mouseMoveHandler, 400);
+                document.addEventListener('mousemove', this.debounceMouseMove, false)
+            }
         },
         mounted() {
             this.$nextTick(() => {
                 let firsSlide = this.$refs[`slide${this.slides[0].id}`][0];
-                this.mouseMoveHandler();
+                this.windowEventHandler();
                 this.slideMoveUp(firsSlide, 1030)
             })
         },
         beforeDestroy() {
-            // document.removeEventListener('mousemove', this.mouseMoveHandler);
+            document.removeEventListener('mousemove', this.debounceMouseMove, false);
+            this.eventTimeouts.forEach(timeout => {
+                clearTimeout(timeout)
+            })
         }
     }
 </script>

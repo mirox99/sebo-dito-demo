@@ -1,6 +1,6 @@
 <template>
     <div class="project-item-view" :class="{'route-from-parent':routeFromParent}">
-        <img src="../../assets/fullproject6.svg" class="item-image" alt="">
+        <img :src="imagePath" class="item-image" alt="">
         <Menu key="menu"/>
     </div>
 </template>
@@ -13,12 +13,23 @@
             routeFromParent: {
                 type: Boolean,
                 default: false,
+            },
+            id: {type: Number}
+        },
+        data() {
+            return {
+                fullImages: [6, 7, 8, 9, 15],
+            }
+        },
+        computed: {
+            imagePath() {
+                let imageId = this.fullImages.find(id => id === this.id) ? this.id : 15;
+
+
+                return require(`../../assets/fullproject${imageId}.svg`)
             }
         },
         components: {Menu},
-        created() {
-            console.log(this.routeFromParent, 'from parent')
-        }
     }
 </script>
 
