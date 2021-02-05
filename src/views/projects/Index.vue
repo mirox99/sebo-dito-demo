@@ -183,11 +183,11 @@
 
                 if (event.deltaY < 0) {
                     this.rows.forEach((row) => {
-                        this.rowAnimationHandler(row, 1, row.speed / 5 * 30)
+                        this.rowAnimationHandler(row, 1, row.speed / 4 * 50)
                     })
                 } else if (event.deltaY > 0) {
                     this.rows.forEach((row) => {
-                        this.rowAnimationHandler(row, -1, row.speed / 5 * 30)
+                        this.rowAnimationHandler(row, -1, row.speed / 4 * 50)
                     })
                 }
                 this.mousewheelTimeOut = setTimeout(() => {
