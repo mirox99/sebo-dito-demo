@@ -14,7 +14,8 @@
     "module": "^1.2.5",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "wheel-inertia": "0.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~4.5.0",
