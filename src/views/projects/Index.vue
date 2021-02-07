@@ -426,9 +426,11 @@ $ease-in-out: cubic-bezier(.64, .01, .65, .99);
           .item-name {
             color: white;
             font-size: 18px;
-            transform: translateY(100%);
             transition: transform .4s .2s $ease-in;
             margin: 0;
+            transform: translateY(100%) perspective(1px) translateZ(0);
+            backface-visibility: hidden;
+            will-change: transform;
           }
         }
       }

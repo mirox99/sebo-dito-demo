@@ -73,7 +73,7 @@ class LoopSlider {
             let firstItemDomHeight = document.querySelector(`#item${row.id}${firstItem.id}`).clientHeight
             let secondItemDomHeight = document.querySelector(`#item${row.id}${secondItem.id}`).clientHeight
 
-            rowDom.style.transform = `translate(0,${-(firstItemDomHeight + secondItemDomHeight + 30)}px)`
+            rowDom.style.transform = `translate(0,${-(firstItemDomHeight + secondItemDomHeight + 40)}px)`
         } catch (e) {
             console.log(e)
         }
@@ -85,7 +85,7 @@ class LoopSlider {
 
         gsap.to(`#r${row.id} .image-container .project-item`, {
             duration: speed,
-            ease: "ease",
+            ease: "power4.out",
             y: direction,
             modifiers: {
                 y: (y) => {
